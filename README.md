@@ -25,4 +25,4 @@ To make it easy for people to find and access gyms around them without stress.
 
 ---
 
-Built with by George
+Built with by George (adombire.dev)
