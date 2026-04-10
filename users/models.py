@@ -6,6 +6,9 @@ class User(AbstractUser):
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     is_gym_owner = models.BooleanField(default=False)
 
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']  # Since email is username, username is required for createsuperuser
+
     class Meta:
         db_table = 'users'
         verbose_name = 'User'
