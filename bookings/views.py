@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from .models import Booking
 from .serializers import BookingListSerializer, BookingCreateSerializer, BookingCancelSerializer
+from .permissions import IsBookingOwner
 
 class UserBookingsView(generics.ListAPIView):
     """
@@ -33,7 +34,7 @@ class CancelBookingView(APIView):
     """
     API endpoint to cancel a booking.
     """
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsBookingOwner]
     
     def post(self, request, pk):
         booking = get_object_or_404(Booking, pk=pk, user=request.user)
@@ -58,7 +59,8 @@ class BookingDetailView(generics.RetrieveAPIView):
     API endpoint to view a single booking details.
     """
     serializer_class = BookingListSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsBookingOwner]
+    queryset = Booking.objects.all()
     
     def get_queryset(self):
         """Only allow users to view their own bookings."""
