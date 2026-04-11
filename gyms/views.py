@@ -7,6 +7,7 @@ from .models import Gym
 from .serializers import GymListSerializer, GymDetailSerializer, GymCreateSerializer, GymUpdateSerializer
 from bookings.models import Booking
 from bookings.serializers import BookingListSerializer
+from .permissions import IsOwnerOrReadOnly
 
 class NearbyGymsView(generics.ListAPIView):
     """
@@ -78,7 +79,7 @@ class GymUpdateView(generics.UpdateAPIView):
     """
     queryset = Gym.objects.all()
     serializer_class = GymUpdateSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
     
     def get_queryset(self):
         """Only allow owners to update their own gyms."""
