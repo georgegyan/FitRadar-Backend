@@ -7,12 +7,12 @@ from .models import Gym
 from .serializers import GymListSerializer, GymDetailSerializer, GymCreateSerializer, GymUpdateSerializer
 from bookings.models import Booking
 from bookings.serializers import BookingListSerializer
-from .permissions import IsOwnerOrReadOnly
-from users.serializers import IsOwnerOrReadOnly
+from .permissions import IsGymOwner
+from users.permissions import IsOwnerOrReadOnly
 
 class GymListCreateView(generics.ListCreateAPIView):
     queryset = Gym.objects.filter(is_active=True)
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsGymOwner]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':

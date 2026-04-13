@@ -1,15 +1,9 @@
 from rest_framework import permissions
 
-class IsOwnerOrReadOnly(permissions.BasePermission):
-    """
-    Custom permission to only allow owners of an object to edit it.
-    Read-only allowed for any request.
-    """
-    
-    def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request
-        if request.method in permissions.SAFE_METHODS:
+class IsGymOwner(permissions.BasePermission):
+    def has_permission(self, request, view):
+        # Allow GET requests for everyone (list view)
+        if request.method == 'GET':
             return True
-        
-        # Write permissions only to the owner of the gym
-        return obj.owner == request.user
+        # For POST/PUT/DELETE, require authenticated gym owner
+        return request.user and request.user.is_authenticated and request.user.is_gym_owner
