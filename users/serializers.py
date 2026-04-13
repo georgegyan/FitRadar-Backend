@@ -17,11 +17,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
-    """
-    Serializer for user registration.
-    Includes password validation and hashing.
-    """
-    
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True, required=True)
     is_gym_owner = serializers.BooleanField(default=False, required=False)  
