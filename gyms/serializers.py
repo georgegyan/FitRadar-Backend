@@ -25,7 +25,7 @@ class GymDetailSerializer(serializers.ModelSerializer):
 class GymCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gym
-        fields = ['name', 'description', 'address', 'latitude', 'longitude',
+        fields = ['name', 'description', 'address', 
                   'price_per_session', 'price_description', 'cover_image', 'images']
     
     def create(self, validated_data):
@@ -33,7 +33,6 @@ class GymCreateSerializer(serializers.ModelSerializer):
         validated_data['owner'] = request.user
         validated_data['submission_type'] = 'owner'  # Mark as owner-submitted
         return super().create(validated_data)
-
 
 class GymUpdateSerializer(serializers.ModelSerializer):
     class Meta:
