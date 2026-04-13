@@ -8,20 +8,28 @@ from .serializers import GymListSerializer, GymDetailSerializer, GymCreateSerial
 from bookings.models import Booking
 from bookings.serializers import BookingListSerializer
 from .permissions import IsOwnerOrReadOnly
+from users.serializers import IsOwnerOrReadOnly
+
+class GymListCreateView(generics.ListCreateAPIView):
+    queryset = Gym.objects.filter(is_active=True)
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return GymCreateSerializer
+        return GymListSerializer
+
+    def perform_create(self, serializer):
+        if not self.request.user.is_gym_owner:
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only gym owners can submit gyms.")
+        serializer.save()
 
 class NearbyGymsView(generics.ListAPIView):
-    """
-    API endpoint to get gyms near a location.
-    Query params: lat, lng, radius_km (default 5km)
-    """
     serializer_class = GymListSerializer
     permission_classes = [permissions.AllowAny]  # Anyone can view gyms
     
     def get_queryset(self):
-        """
-        Filter gyms by proximity to given coordinates.
-        Uses simple bounding box for MVP (more accurate would use Haversine formula).
-        """
         queryset = Gym.objects.filter(is_active=True)
         
         lat = self.request.query_params.get('lat')
@@ -50,21 +58,16 @@ class NearbyGymsView(generics.ListAPIView):
         
         return queryset
 
-
 class GymDetailView(generics.RetrieveAPIView):
-    """
-    API endpoint for detailed view of a single gym.
-    """
-    queryset = Gym.objects.filter(is_active=True)
-    serializer_class = GymDetailSerializer
-    permission_classes = [permissions.AllowAny]
-    lookup_field = 'pk'
+    queryset = Gym.objects.all()
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return GymCreateSerializer  # reuse same serializer for updates
+        return GymDetailSerializer
 
 class GymCreateView(generics.CreateAPIView):
-    """
-    API endpoint for gym owners to submit new gyms.
-    """
     serializer_class = GymCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
     
@@ -72,11 +75,7 @@ class GymCreateView(generics.CreateAPIView):
         """Save the gym with the current user as owner."""
         serializer.save(owner=self.request.user, submission_type='owner')
 
-
 class GymUpdateView(generics.UpdateAPIView):
-    """
-    API endpoint for gym owners to update their gym.
-    """
     queryset = Gym.objects.all()
     serializer_class = GymUpdateSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
@@ -85,12 +84,7 @@ class GymUpdateView(generics.UpdateAPIView):
         """Only allow owners to update their own gyms."""
         return Gym.objects.filter(owner=self.request.user)
 
-
 class GymBookingsView(generics.ListAPIView):
-    """
-    API endpoint to list all bookings for a specific gym.
-    Only accessible to the gym owner.
-    """
     serializer_class = BookingListSerializer
     permission_classes = [permissions.IsAuthenticated]
     
