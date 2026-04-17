@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     # Local apps
     'users',
-    # 'gyms',
+    'gyms',
     # 'bookings',
 ]
 
