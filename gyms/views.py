@@ -1,7 +1,6 @@
 from django.shortcuts import render
-
-# Create your views here.
 from rest_framework import generics, permissions
+from rest_framework.exceptions import PermissionDenied
 from .models import Gym
 from .serializers import GymSerializer
 
@@ -10,7 +9,8 @@ class GymListCreateView(generics.ListCreateAPIView):
     serializer_class = GymSerializer
 
     def perform_create(self, serializer):
-        # Only authenticated users can create, and we set owner to current user
+        if not self.request.user.is_gym_owner:
+            raise PermissionDenied("Only gym owners can create gyms.")
         serializer.save(owner=self.request.user)
 
     def get_permissions(self):
