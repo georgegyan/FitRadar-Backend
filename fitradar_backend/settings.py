@@ -34,11 +34,11 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     # Local apps
     'users',
-    'gyms',
-    'bookings',
+    # 'gyms',
+    # 'bookings',
 ]
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 CORS_ALLOW_ALL_ORIGINS = True
 
