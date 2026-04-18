@@ -72,7 +72,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'fitradar_backend.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
@@ -128,6 +127,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Temporary, will change to
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',  # Temporary, will change
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
