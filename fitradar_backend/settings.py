@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     # Local apps
     'users',
     'gyms',
-    # 'bookings',
+    'bookings',
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
