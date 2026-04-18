@@ -17,3 +17,24 @@ class GymListCreateView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
+    
+class GymOwnerManageView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = GymSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Gym.objects.filter(owner=self.request.user)
+    
+    def delete(self, request, *args, **kwargs):
+        if not request.user.is_gym_owner:
+            raise PermissionDenied("Only gym owners can delete gyms.")
+        return super().delete(request, *args, **kwargs)
+    
+class GymOwnerListView(generics.ListAPIView):
+    serializer_class = GymSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if not self.request.user.is_gym_owner:
+            return Gym.objects.none()
+        return Gym.objects.filter(owner=self.request.user).order_by('-created_at')
