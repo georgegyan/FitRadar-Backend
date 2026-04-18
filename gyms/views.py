@@ -1,12 +1,22 @@
 from django.shortcuts import render
 from rest_framework import generics, permissions
 from rest_framework.exceptions import PermissionDenied
+from django.db.models import Q
 from .models import Gym
 from .serializers import GymSerializer
 
 class GymListCreateView(generics.ListCreateAPIView):
     queryset = Gym.objects.all().order_by('-created_at')
     serializer_class = GymSerializer
+
+    def get_queryset(self):
+        queryset = Gym.objects.all().order_by('-created_at')
+        search_query = self.request.query_params.get('search', None)
+        if search_query:
+            queryset = queryset.filter(
+                Q(name_icontains=search_query) | Q(address_icontains=search_query)
+            )
+        return queryset
 
     def perform_create(self, serializer):
         if not self.request.user.is_gym_owner:
