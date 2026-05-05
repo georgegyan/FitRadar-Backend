@@ -48,3 +48,8 @@ class GymOwnerListView(generics.ListAPIView):
         if not self.request.user.is_gym_owner:
             return Gym.objects.none()
         return Gym.objects.filter(owner=self.request.user).order_by('-created_at')
+    
+class GymDetailView(generics.RetrieveAPIView):
+    queryset = Gym.objects.all()
+    serializer_class = GymSerializer
+    permission_classes = [permissions.AllowAny]
